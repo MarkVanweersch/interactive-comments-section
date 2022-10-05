@@ -14,9 +14,8 @@
 
 </head>
 <body>
-
-  <div style="height: 200px;">
     
+<!-- connection setup -->
   <?php
     $servername = "localhost:3310";
     $username = "root";
@@ -28,136 +27,172 @@
     if ($conn->connect_error) {
       die("Connection failed" . $conn->connect_error);
     }
-    echo "Connected succesfully";
+  ?>
 
-    $comments_query = "SELECT * FROM comments";
-    $result = $conn->query($comments_query);
+<!-- main comment load -->
+  <?php
 
-    echo "<br>";
+    function get_comments($conn) {
+      $comments_query = "SELECT * FROM comments ORDER BY upvotes DESC";
+      $comments = $conn->query($comments_query);
 
-    var_dump($result);
+      if ($comments->num_rows > 0) {
+        while ($row = $comments->fetch_assoc()) {
 
-    echo "<br>";
+          ?>
 
-    if ($result->num_rows > 0) {
-      while ($row = $result->fetch_assoc()) {
-        echo "Comment id = " . $row["comment_id"];
+            <article class="comment-card">
+
+            <div class="upvote-bar">
+              <img src="./images/icon-plus.svg" alt="">
+              <span class="upvote-number">
+                <?php
+                  echo $row["upvotes"];
+                ?>
+              </span>
+              <img src="./images/icon-minus.svg" alt="">
+            </div>
+
+            <div class="comment-info-container">
+
+              <header class="comment-header">
+                <img src=<?php get_user_avatar($row["user_id"], $conn); ?> alt="">
+                <span class="name">
+                  <?php
+                    get_user_name($row["user_id"], $conn);
+                  ?>
+                </span>
+                <span class="date">
+                  <?php
+                    echo $row["post_date"];
+                  ?>
+                </span>
+                <div class="reply-button">
+                  <img src="./images/icon-reply.svg" alt="">
+                  <span>Reply</span>
+                </div>
+              </header>
+
+              <p class="comment-text">
+                <?php
+                  echo $row["text"];
+                ?>
+              </p>
+              
+            </div>
+
+            </article>
+
+          <?php
+  
+          get_replies($row["comment_id"], $conn);
+  
+        }
       }
     }
-    
+
+    // get the avatar url from user
+
+    function get_user_avatar($id, $conn) {
+      $avatar_url_query = "SELECT avatar_url FROM users WHERE user_id = " . $id;
+      $avatar_url = $conn->query($avatar_url_query);
+
+      if ($avatar_url->num_rows > 0) {
+        while ($row = $avatar_url->fetch_assoc()) {
+          echo $row["avatar_url"];
+        }
+      }
+    }
+
+    // get comment's author name
+
+    function get_user_name($id, $conn) {
+      $user_query = "SELECT user_name FROM users WHERE user_id = " . $id;
+      $user_name = $conn->query($user_query);
+
+      if ($user_name->num_rows > 0) {
+        while ($row = $user_name->fetch_assoc()) {
+          echo $row["user_name"];
+        }
+      }
+    }
+
+    // load any replies on comments
+
+    function get_replies($id, $conn) {
+      $replies_query = "SELECT * FROM replies WHERE comment_id = " . $id;
+      $replies = $conn->query($replies_query);
+
+      if ($replies->num_rows > 0) {
+
+        ?>
+          <div class="comment-replies-container">
+        <?php
+        
+        while ($row = $replies->fetch_assoc()) {
+
+          ?>
+
+          <article class="comment-card">
+
+            <div class="upvote-bar">
+              <img src="./images/icon-plus.svg" alt="">
+              <span class="upvote-number">
+                <?php
+                  echo $row["upvotes"];
+                ?>
+              </span>
+              <img src="./images/icon-minus.svg" alt="">
+            </div>
+            
+            <div class="comment-info-container">
+
+              <header class="comment-header">
+                <img src= <?php get_user_avatar($row["user_id"], $conn) ?> alt="">
+                <span class="name">
+                  <?php
+                    get_user_name($row["user_id"], $conn);
+                  ?>
+                </span>
+                <span class="date">
+                  <?php
+                    echo $row["post_date"];
+                  ?>
+                </span>
+                <div class="reply-button">
+                  <img src="./images/icon-reply.svg" alt="">
+                  <span>Reply</span>
+                </div>
+              </header>
+
+              <p class="comment-text">
+                <?php
+                  echo $row["text"];
+                ?>
+              </p>
+              
+            </div>
+            
+          </article>
+
+          <?php
+          
+        }
+
+        ?>
+          </div>
+        <?php
+      }
+    }
+
+
   ?>
-  
-  </div>
 
   <main class="main-container">
 
-    <article class="comment-card">
-
-      <div class="upvote-bar">
-        <img src="./images/icon-plus.svg" alt="">
-        <span class="upvote-number">12</span>
-        <img src="./images/icon-minus.svg" alt="">
-      </div>
-      
-      <div class="comment-info-container">
-
-        <header class="comment-header">
-          <img src="./images/avatars/image-amyrobson.png" alt="">
-          <span class="name">amyrobson</span>
-          <span class="date">1 month ago</span>
-          <div class="reply-button">
-            <img src="./images/icon-reply.svg" alt="">
-            <span>Reply</span>
-          </div>
-        </header>
-
-        <p class="comment-text">Impressive! Though it seems the drag feature could be improved. But overall it looks incredible. You've nailed the design and the responsiveness at various breakpoints works really well.</p>
-        
-      </div>
-      
-    </article>
-
-    <article class="comment-card">
-
-      <div class="upvote-bar">
-        <img src="./images/icon-plus.svg" alt="">
-        <span class="upvote-number">5</span>
-        <img src="./images/icon-minus.svg" alt="">
-      </div>
-      
-      <div class="comment-info-container">
-
-        <header class="comment-header">
-          <img src="./images/avatars/image-maxblagun.png" alt="">
-          <span class="name">maxblagun</span>
-          <span class="date">2 weeks ago</span>
-          <div class="reply-button">
-            <img src="./images/icon-reply.svg" alt="">
-            <span>Reply</span>
-          </div>
-        </header>
-
-        <p class="comment-text">Woah, your project looks awesome! How long have you been coding for? I'm still new, but think I want to dive into React as well soon. Perhaps you can give me an insight on where I can learn React? Thanks!</p>
-        
-      </div>
-      
-    </article>
-
-    <div class="comment-replies-container">
-
-      <article class="comment-card">
-
-        <div class="upvote-bar">
-          <img src="./images/icon-plus.svg" alt="">
-          <span class="upvote-number">4</span>
-          <img src="./images/icon-minus.svg" alt="">
-        </div>
-        
-        <div class="comment-info-container">
-  
-          <header class="comment-header">
-            <img src="./images/avatars/image-ramsesmiron.png" alt="">
-            <span class="name">ramsesmiron</span>
-            <span class="date">1 week ago</span>
-            <div class="reply-button">
-              <img src="./images/icon-reply.svg" alt="">
-              <span>Reply</span>
-            </div>
-          </header>
-  
-          <p class="comment-text">If you're still new, I'd recommend focusing on the fundamentals of HTML, CSS, and JS before considering React. It's very tempting to jump ahead but lay a solid foundation first.</p>
-          
-        </div>
-        
-      </article>
-
-      <article class="comment-card">
-
-        <div class="upvote-bar">
-          <img src="./images/icon-plus.svg" alt="">
-          <span class="upvote-number">2</span>
-          <img src="./images/icon-minus.svg" alt="">
-        </div>
-        
-        <div class="comment-info-container">
-  
-          <header class="comment-header">
-            <img src="./images/avatars/image-juliusomo.png" alt="">
-            <span class="name">juliusomo</span>
-            <span class="date">2 days ago</span>
-            <div class="reply-button">
-              <img src="./images/icon-reply.svg" alt="">
-              <span>Reply</span>
-            </div>
-          </header>
-  
-          <p class="comment-text">I couldn't agree more with this. Everything moves so fast and it always seems like everyone knows the newest library/framework. But the fundamentals are what stay constant.</p>
-          
-        </div>
-        
-      </article>
-      
-    </div>
+    <?php
+      get_comments($conn);
+    ?>
 
     <article class="comment-card new-comment">
 
@@ -172,13 +207,6 @@
       <input class="button submit" type="submit" form="new-comment" value="SEND">
       
     </article>
-
-    <div>
-
-
-    
-    </div>
-
     
   </main>
 

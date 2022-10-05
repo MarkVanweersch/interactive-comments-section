@@ -42,6 +42,7 @@ body {
 
 .main-container {
   margin-inline: auto;
+  padding-block: 2em;
   max-width: 730px;
 
   display: flex;
