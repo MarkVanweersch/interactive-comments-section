@@ -50,9 +50,15 @@ body {
   gap: 1.25em;
 }
 
+.comments-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25em;
+}
+
 .comment-card {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: 36px auto;
   gap: 1.5em;
 
   padding: 1.5em;
@@ -66,6 +72,7 @@ body {
   align-items: center;
   gap: 1.25em;
 
+  /* max-width: 36px; */
   height: fit-content;
   padding: 0.8em;
 
@@ -82,10 +89,6 @@ body {
 .upvote-bar .upvote-number {
   color: var(--clr-prm-moderate-blue);
   font-weight: 500;
-}
-
-.comment-info-container {
-  
 }
 
 .comment-header {
@@ -112,10 +115,7 @@ body {
 
 .comment-header .reply-button {
   margin-left: auto;
-}
-
-.comment-header .reply-button img {
-
+  cursor: pointer;
 }
 
 .comment-header .reply-button span {
@@ -168,10 +168,6 @@ body {
   border-radius: 0.5em;
 }
 
-.comment-card.new-comment textarea::placeholder {
-
-}
-
 .button {
   padding: 0.9em;
   font-size: 0.9em;
@@ -179,7 +175,7 @@ body {
   border: none;
 }
 
-.button.submit {
+.button.comment {
   width: 16.75%;
   color: var(--clr-ntr-white);
   background-color: var(--clr-prm-moderate-blue)

@@ -1,19 +1,20 @@
 <?php
 
+  include("./db-connection.php");
   include("./comment-functions.php");
 
-  get_comments($conn);
+  load_new_comment($conn);
 
-  function get_comments($conn) {
-    $comments_query = "SELECT * FROM comments ORDER BY upvotes DESC";
-    $comments = $conn->query($comments_query);
+  function load_new_comment($conn) {
+    $latest_comment_query = "SELECT * FROM comments ORDER BY comment_id DESC LIMIT 1";
+    $latest_comment = $conn->query($latest_comment_query);
 
-    if ($comments->num_rows > 0) {
-      while ($row = $comments->fetch_assoc()) {
+    if ($latest_comment->num_rows > 0) {
+      while ($row = $latest_comment->fetch_assoc()) {
 
         ?>
 
-          <article class="comment-card" data-id=<?php echo $row["comment_id"] ?> data-type="comment">
+          <article class="comment-card">
 
           <div class="upvote-bar">
             <img src="./images/icon-plus.svg" alt="">
@@ -54,13 +55,8 @@
           </div>
 
           </article>
-
         <?php
-
-        get_replies($row["comment_id"], $conn);
-
       }
     }
   }
-
 ?>

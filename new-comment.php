@@ -1,26 +1,10 @@
 <?php
 
-  $servername = "localhost:3310";
-  $username = "root";
-  $password = "";
-  $dbname = "interactive_comments_section";
-
-  $conn = new mysqli($servername, $username, $password, $dbname);
-
-  if ($conn->connect_error) {
-    die("Connection failed" . $conn->connect_error);
-  }
-
-  echo "Connected succesfully<br><br>";
+  include("./db-connection.php");
 
   $user = "juliusomo";
-  $text = $_POST["text"];
+  $text = $_POST['text'];
   $date = date("Y-m-d");
-
-  echo $user;
-  echo $text;
-  echo $date;
-  echo "<br><br>";
 
   create_comment($conn, $user, $text, $date);
 
