@@ -1,3 +1,41 @@
+// add event listeners to plus and minus icons
+
+plusIcons = document.querySelectorAll(".plus-icon");
+minusIcons = document.querySelectorAll(".minus-icon");
+
+plusIcons.forEach((icon) => {
+  icon.addEventListener("click", giveUpvote);
+});
+
+minusIcons.forEach((icon) => {
+  icon.addEventListener("click", giveDownvote);
+});
+
+
+// add event listeners to delete buttons
+
+deleteButtons = document.querySelectorAll(".delete-button");
+
+deleteButtons.forEach((button) => {
+  button.addEventListener("click", deleteComment);
+});
+
+// add event listeners to edit buttons
+
+editButtons = document.querySelectorAll(".edit-button");
+
+editButtons.forEach((button) => {
+  button.addEventListener("click", editComment);
+});
+
+// add event listeners to reply buttons
+
+replyButtons = document.querySelectorAll(".reply-button");
+
+replyButtons.forEach((button) => {
+button.addEventListener("click", insertReplyBox);
+});
+
 // insert a new comment
 
 const newCommentButton = document.querySelector(".button.comment");
@@ -21,6 +59,8 @@ function createComment() {
         if (loadCommentRequest.readyState == 4 && loadCommentRequest.status == 200) {
           const newCommentDiv = document.createElement("div");
           newCommentDiv.innerHTML = loadCommentRequest.response;
+          newCommentDiv.querySelector(".edit-button").addEventListener("click", editComment);
+          newCommentDiv.querySelector(".delete-button").addEventListener("click", deleteComment);
           commentsContainer.appendChild(newCommentDiv);
         } 
       }
@@ -29,17 +69,6 @@ function createComment() {
     }
   }
 }
-
-// add event listeners to reply buttons
-
-eventListenersToReplyButtons();
-function eventListenersToReplyButtons() {
-  replyButtons = document.querySelectorAll(".reply-button");
-
-  replyButtons.forEach((button) => {
-  button.addEventListener("click", insertReplyBox);
-});
-};
 
 
 // insert reply box
@@ -101,9 +130,11 @@ function createReply(event) {
           const newCommentsContainer = replyContainer.closest(".comment-wrapper").querySelector(".comment-replies-container");
           const newReplyDiv = document.createElement("div");
           newReplyDiv.innerHTML = newReplyRequest.response;
+          console.log(newReplyDiv);
+          newReplyDiv.querySelector(".edit-button").addEventListener("click", editComment);
+          newReplyDiv.querySelector(".delete-button").addEventListener("click", deleteComment);
           newCommentsContainer.appendChild(newReplyDiv);
           replyContainer.remove();
-          eventListenersToReplyButtons();
         }
       }
 
@@ -116,4 +147,96 @@ function createReply(event) {
   xhr.open("POST", "./new-reply.php", true);
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
   xhr.send(info);
+}
+
+// edit comment
+
+function editComment(event) {
+  const editButton = event.currentTarget;
+  editButton.removeEventListener("click", editComment);
+  editButton.addEventListener("click", stopEditComment);
+
+  const editBox = document.createElement("textarea");
+
+  const updateButton = document.createElement("button");
+  updateButton.classList.add("button", "comment", "update");
+  updateButton.addEventListener("click", updateComment);
+
+  const updateButtonText = "UPDATE";
+  const updateButtonTextNode = document.createTextNode(updateButtonText);
+  updateButton.appendChild(updateButtonTextNode);
+
+
+  const commentText = event.currentTarget.closest(".comment-card").querySelector(".comment-text");
+
+  editBox.value = commentText.innerText;
+
+  commentText.style.display = "none";
+
+  const commentInfoContainer =  event.currentTarget.closest(".comment-info-container")
+  commentInfoContainer.appendChild(editBox);
+  commentInfoContainer.appendChild(updateButton);
+
+}
+
+// stop edit comment
+
+function stopEditComment(event) {
+  const comment = event.currentTarget.closest(".comment-card");
+  comment.querySelector("textarea").remove();
+  comment.querySelector(".button.update").remove();
+  comment.querySelector(".comment-text").style.display = "block";
+  event.currentTarget.addEventListener("click", editComment);
+  event.currentTarget.removeEventListener("click", stopEditComment);
+}
+
+// update comment
+
+function updateComment() {
+  console.log("Updated");
+}
+
+// delete comment
+
+function deleteComment() {
+  console.log("Delete meh");
+  // show modal before deleting
+}
+
+// upvote comment
+
+function giveUpvote(event) {
+  const icon = event.currentTarget;
+  const commentId = icon.closest(".comment-card").dataset.id;
+  icon.removeEventListener("click", giveUpvote);
+  icon.classList.remove("pointer");
+  changeUpvotes(commentId, "1");
+}
+
+// downvote comment
+
+function giveDownvote(event) {
+  const icon = event.currentTarget;
+  const commentId = icon.closest(".comment-card").dataset.id;
+  icon.removeEventListener("click", giveDownvote);
+  icon.classList.remove("pointer");
+  changeUpvotes(commentId, "-1");
+}
+
+// ajax upvotes call
+
+function changeUpvotes(commentId, value) {
+  const xhr = new XMLHttpRequest();
+  const postInfo = "comment_id=" + commentId.toString() + "&value=" + value;
+  console.log(postInfo);
+
+  xhr.onreadystatechange = () => {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      alert(xhr.responseText);
+    }
+  };
+
+  xhr.open("POST", "./change-upvote.php", true);
+  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhr.send(postInfo);
 }

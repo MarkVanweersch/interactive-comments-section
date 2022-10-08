@@ -3,13 +3,13 @@
     <article class="comment-card" data-id=<?php echo $row["comment_id"] ?>>
 
     <div class="upvote-bar">
-      <img src="./images/icon-plus.svg" alt="">
+      <img class="plus-icon pointer" src="./images/icon-plus.svg" alt="">
       <span class="upvote-number">
         <?php
           echo $row["upvotes"];
         ?>
       </span>
-      <img src="./images/icon-minus.svg" alt="">
+      <img class="minus-icon pointer" src="./images/icon-minus.svg" alt="">
     </div>
 
     <div class="comment-info-container">
@@ -26,18 +26,33 @@
             echo $row["post_date"];
           ?>
         </span>
-        <div class="delete-button">
-          <img src="./images/icon-delete.svg" alt="">
-          <span>Delete</span>
+
+        <div class="comment-header-options">
+
+        <?php
+          if ($row["user_id"] == 4) {
+            ?>
+              <div class="delete-button">
+                <img src="./images/icon-delete.svg" alt="">
+                <span>Delete</span>
+              </div>
+              <div class="edit-button">
+                <img src="./images/icon-edit.svg" alt="">
+                <span>Edit</span>
+              </div>
+            <?php
+          } else {
+            ?>
+              <div class="reply-button">
+                <img src="./images/icon-reply.svg" alt="">
+                <span>Reply</span>
+              </div>
+            <?php
+          }
+        ?>
+        
         </div>
-        <div class="edit-button">
-          <img src="./images/icon-edit.svg" alt="">
-          <span>Edit</span>
-        </div>
-        <div class="reply-button">
-          <img src="./images/icon-reply.svg" alt="">
-          <span>Reply</span>
-        </div>
+
       </header>
 
       <p class="comment-text">

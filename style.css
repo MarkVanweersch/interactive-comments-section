@@ -95,7 +95,14 @@ body {
 .upvote-bar img {
   width: 10px;
   height: auto;
-  color: var(--clr-ntr-light-gray)
+}
+
+.upvote-bar img:hover {
+  color: var(--clr-prm-moderate-blue);
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 .upvote-bar .upvote-number {
@@ -125,19 +132,44 @@ body {
   color: var(--clr-ntr-gray-blue)
 }
 
-.comment-header .reply-button {
+.comment-header .comment-header-options {
   margin-left: auto;
+  display: flex;
+  gap: 1em;
+}
+
+.comment-header .delete-button, 
+.comment-header .edit-button, 
+.comment-header .reply-button {
+  font-weight: 700;
   cursor: pointer;
 }
 
+.comment-header .delete-button span {
+  color: var(--clr-prm-soft-red);
+}
+
+.comment-header .delete-button:hover span {
+  color: var(--clr-prm-pale-red);
+}
+
+.comment-header .edit-button span, 
 .comment-header .reply-button span {
   color: var(--clr-prm-moderate-blue);
-  font-weight: 700;
+}
+
+.comment-header .edit-button:hover span, 
+.comment-header .reply-button:hover span {
+  color: var(--clr-prm-light-gray-blue);
 }
 
 .comment-text {
   line-height: 24px;
   color: var(--clr-ntr-gray-blue);
+}
+
+.comment-info-container textarea {
+  height: 150px;
 }
 
 .comment-replies-container {
@@ -169,7 +201,8 @@ body {
   width: 100%;
 }
 
-.comment-card.new-comment textarea {
+.comment-card.new-comment textarea, 
+.comment-info-container textarea {
   width: 100%;
   padding: 0.75em 1.5em;
 
@@ -196,6 +229,11 @@ body {
 
 .button.reply {
   width: 100%;
+}
+
+.button.update {
+  display: block;
+  margin-left: auto;
 }
 
 .reply-box-buttons-container {
