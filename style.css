@@ -56,6 +56,18 @@ body {
   gap: 1.25em;
 }
 
+.comment-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25em;
+}
+
+.comment-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
 .comment-card {
   display: grid;
   grid-template-columns: 36px auto;
@@ -148,7 +160,7 @@ body {
   align-items: flex-start;
 }
 
-.comment-card.new-comment img {
+.comment-card.new-comment .new-comment-avatar {
   max-width: 40px;
   height: auto;
 }
@@ -173,10 +185,30 @@ body {
   font-size: 0.9em;
   border-radius: 0.5em;
   border: none;
+  cursor: pointer;
 }
 
 .button.comment {
   width: 16.75%;
   color: var(--clr-ntr-white);
   background-color: var(--clr-prm-moderate-blue)
+}
+
+.button.reply {
+  width: 100%;
+}
+
+.reply-box-buttons-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100px;
+}
+
+.reply-box-buttons-container img {
+  display: block;
+  margin-left: auto;
+  width: 15px;
+  height: auto;
+  cursor: pointer;
 }

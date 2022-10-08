@@ -12,26 +12,27 @@
   
   <title>Frontend Mentor | Interactive comments section</title>
 
-</head>
-<body>
-
   <?php
     include("./db-connection.php");
+    include("./comment-functions.php");
   ?>
+
+</head>
+<body>
 
   <main class="main-container">
 
     <div class="comments-container">
 
       <?php
-        include ("./comment-template.php");
+        get_comments($conn);
       ?>
 
     </div>
 
     <article class="comment-card new-comment">
 
-      <img src="images/avatars/image-juliusomo.png" alt="">
+      <img class="new-comment-avatar" src="images/avatars/image-juliusomo.png" alt="">
 
       <textarea name="text" id="" cols="30" rows="3" placeholder="Add a comment..."></textarea>
 
