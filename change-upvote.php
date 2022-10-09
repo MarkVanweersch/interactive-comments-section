@@ -24,7 +24,7 @@
   function changeUpvotes($comment_id, $new_upvotes, $conn) {
     $change_upvote_query = "UPDATE comments SET upvotes=" . $new_upvotes . " WHERE comment_id =" . $comment_id;
     if ($conn->query($change_upvote_query) == TRUE) {
-      echo "Updated";
+      echo $new_upvotes;
     } else {
       echo $conn->error;
     }

@@ -5,10 +5,14 @@ minusIcons = document.querySelectorAll(".minus-icon");
 
 plusIcons.forEach((icon) => {
   icon.addEventListener("click", giveUpvote);
+  icon.addEventListener("mouseover", makeBold);
+  icon.addEventListener("mouseleave", makeRegular);
 });
 
 minusIcons.forEach((icon) => {
   icon.addEventListener("click", giveDownvote);
+  icon.addEventListener("mouseover", makeBold);
+  icon.addEventListener("mouseleave", makeRegular);
 });
 
 
@@ -36,7 +40,7 @@ replyButtons.forEach((button) => {
 button.addEventListener("click", insertReplyBox);
 });
 
-// insert a new comment
+// create and insert a new comment
 
 const newCommentButton = document.querySelector(".button.comment");
 const commentsContainer = document.querySelector(".comments-container");
@@ -69,7 +73,6 @@ function createComment() {
     }
   }
 }
-
 
 // insert reply box
 
@@ -145,7 +148,7 @@ function createReply(event) {
   }
 
   xhr.open("POST", "./new-reply.php", true);
-  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   xhr.send(info);
 }
 
@@ -165,7 +168,6 @@ function editComment(event) {
   const updateButtonText = "UPDATE";
   const updateButtonTextNode = document.createTextNode(updateButtonText);
   updateButton.appendChild(updateButtonTextNode);
-
 
   const commentText = event.currentTarget.closest(".comment-card").querySelector(".comment-text");
 
@@ -192,8 +194,25 @@ function stopEditComment(event) {
 
 // update comment
 
-function updateComment() {
-  console.log("Updated");
+function updateComment(event) {
+  const comment = event.currentTarget.closest(".comment-card");
+  const commentId = comment.dataset.id;
+  let postInfo = "text=" + comment.querySelector("textarea").value;
+  postInfo += "&commentid=" + commentId;
+  
+  const xhr = new XMLHttpRequest();
+
+  xhr.onreadystatechange = () => {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      console.log(xhr.response);
+
+      // vervolgens weer de textarea sluiten en de geüpdatete comment laten zien
+    }
+  }
+
+  xhr.open("POST", "./update-comment.php", true)
+  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhr.send(postInfo);
 }
 
 // delete comment
@@ -207,36 +226,101 @@ function deleteComment() {
 
 function giveUpvote(event) {
   const icon = event.currentTarget;
-  const commentId = icon.closest(".comment-card").dataset.id;
+  icon.style.width = "12px";
+  icon.src = "./images/icon-plus-blue.svg";
   icon.removeEventListener("click", giveUpvote);
+  icon.removeEventListener("mouseover", makeBold);
+  icon.removeEventListener("mouseleave", makeRegular);
   icon.classList.remove("pointer");
-  changeUpvotes(commentId, "1");
+
+  const comment = icon.closest(".comment-card");
+  const commentId = comment.dataset.id;
+  changeUpvotes(commentId, icon, "1");
+
+  const minusIcon = comment.querySelector(".minus-icon");
+  minusIcon.removeEventListener("click", giveDownvote);
+  minusIcon.removeEventListener("mouseover", makeBold);
+  minusIcon.classList.remove("pointer");
+  /* minusIcon.addEventListener("click", giveUpvoteTwice); */
 }
 
 // downvote comment
 
 function giveDownvote(event) {
   const icon = event.currentTarget;
-  const commentId = icon.closest(".comment-card").dataset.id;
+  icon.style.width = "12px";
   icon.removeEventListener("click", giveDownvote);
+  icon.removeEventListener("mouseover", makeBold);
+  icon.removeEventListener("mouseleave", makeRegular);
   icon.classList.remove("pointer");
-  changeUpvotes(commentId, "-1");
+
+  const comment = icon.closest(".comment-card");
+  const commentId = comment.dataset.id;
+  changeUpvotes(commentId, icon, "-1");
+
+  const plusIcon = comment.querySelector(".plus-icon");
+  plusIcon.removeEventListener("click", giveUpvote);
+  plusIcon.removeEventListener("mouseover", makeBold);
+  plusIcon.removeEventListener("mouseleave", makeRegular);
+  plusIcon.classList.toggle("pointer");
+}
+
+// upvote downvoted comment
+
+function giveUpvoteTwice(event) {
+
+}
+
+// downvote upvoted comment
+
+function giveDownVoteTwice(event) {
+  /* const icon = event.currentTarget;
+  icon.style.width = "12px"; */
+
 }
 
 // ajax upvotes call
 
-function changeUpvotes(commentId, value) {
+function changeUpvotes(commentId, icon, value) {
   const xhr = new XMLHttpRequest();
   const postInfo = "comment_id=" + commentId.toString() + "&value=" + value;
-  console.log(postInfo);
+  const upvoteNumber = icon.closest(".upvote-bar").querySelector(".upvote-number")
 
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
-      alert(xhr.responseText);
+      return displayUpvote(xhr.response);
     }
-  };
+  }
+
+  function displayUpvote(number) {
+    upvoteNumber.innerText = number;
+  }
 
   xhr.open("POST", "./change-upvote.php", true);
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   xhr.send(postInfo);
+}
+
+// make plus and minus icons bold on mouseover
+
+function makeBold(event) {
+  const icon = event.currentTarget;
+  icon.style.width = "12px";
+  if (icon.src.indexOf("icon-plus") > 0) {
+    icon.src = "./images/icon-plus-blue.svg";
+  } else {
+    icon.src = "./images/icon-minus-blue.svg";
+  }
+}
+
+// make plus and minus icons normal after mouse leaves
+
+function makeRegular(event) {
+  const icon = event.currentTarget;
+  icon.style.width = "10px";
+  if (icon.src.indexOf("icon-plus") > 0) {
+    icon.src = "./images/icon-plus.svg";
+  } else {
+    icon.src = "./images/icon-minus.svg";
+  }
 }
