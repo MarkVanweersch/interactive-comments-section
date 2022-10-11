@@ -44,16 +44,6 @@ body {
   margin-inline: auto;
   padding-block: 2em;
   max-width: 730px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 1.25em;
-}
-
-.comments-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25em;
 }
 
 .comment-wrapper {
@@ -117,6 +107,10 @@ body {
   margin-bottom: 1em;
 }
 
+.comment-options-container.mobile {
+  display: none;
+}
+
 .comment-header img {
   max-width: 35px;
   height: auto;
@@ -131,34 +125,34 @@ body {
   color: var(--clr-ntr-gray-blue)
 }
 
-.comment-header .comment-header-options {
+.comment-header-options {
   margin-left: auto;
   display: flex;
   gap: 1em;
 }
 
-.comment-header .delete-button, 
-.comment-header .edit-button, 
-.comment-header .reply-button {
+.comment-header-options .delete-button, 
+.comment-header-options .edit-button, 
+.comment-header-options .reply-button {
   font-weight: 700;
   cursor: pointer;
 }
 
-.comment-header .delete-button span {
+.comment-header-options .delete-button span {
   color: var(--clr-prm-soft-red);
 }
 
-.comment-header .delete-button:hover span {
+.comment-header-options .delete-button:hover span {
   color: var(--clr-prm-pale-red);
 }
 
-.comment-header .edit-button span, 
-.comment-header .reply-button span {
+.comment-header-options .edit-button span, 
+.comment-header-options .reply-button span {
   color: var(--clr-prm-moderate-blue);
 }
 
-.comment-header .edit-button:hover span, 
-.comment-header .reply-button:hover span {
+.comment-header-options .edit-button:hover span, 
+.comment-header-options .reply-button:hover span {
   color: var(--clr-prm-light-gray-blue);
 }
 
@@ -172,10 +166,6 @@ body {
 }
 
 .comment-replies-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25em;
-
   margin-left: auto;
   width: 93.75%; 
 
@@ -248,4 +238,139 @@ body {
   width: 15px;
   height: auto;
   cursor: pointer;
+}
+
+.delete-modal-container {
+  display: none;
+  
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5em;
+
+  padding: 2em;
+  width: 400px;
+
+  border-radius: 1em;
+  background-color: var(--clr-ntr-white);
+}
+
+.delete-modal-container.active {
+  display: flex;
+}
+
+.dete-modal-container h2 {
+  color: var(--clr-prm-light-gray-blue);
+}
+
+.delete-modal-container p {
+  color: var(--clr-ntr-gray-blue);
+}
+
+.delete-modal-container .buttons-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.delete-modal-container .buttons-container button {
+  width: 100%;
+  font-size: 1.05em;
+}
+
+.button.cancel {
+  color: var(--clr-ntr-white);
+  background-color: var(--clr-ntr-gray-blue);
+}
+
+.button.delete {
+  color: var(--clr-ntr-white);
+  background-color: var(--clr-prm-soft-red);
+}
+
+.dark-overlay {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.dark-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+@media screen and (max-width: 400px) {
+  .main-container {
+    padding-inline: 1em;
+  }
+
+  .comment-card {
+    display: block;
+  }
+
+  .upvote-bar.desktop {
+    display: none;
+  }
+
+  .comment-header-options.desktop {
+    display: none;
+  }
+
+  .comment-options-container.mobile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1em;
+  }
+
+  .upvote-bar.mobile {
+    flex-direction: row;
+  }
+
+  .comment-header-options.mobile {
+    margin-left: unset;
+  }
+
+  .comment-replies-container {
+    width: 100%;
+  }
+
+  .comment-replies-container .comment-card {
+    margin-left: 3.125%;
+  }
+
+  .comment-card.new-comment {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+  }
+  
+  .comment-card.new-comment textarea {
+    grid-column: 1 / 3;
+    grid-row: 1 / 2;
+  }
+
+  .button.comment {
+    margin-left: auto;
+    width: fit-content;
+  }
+
+  .reply-box-buttons-container {
+    flex-direction: row-reverse;
+    align-items: center;
+
+    height: unset;
+  }
+
+  .reply-box-buttons-container img {
+    width: 18px;
+    height: 22px;
+  }
 }

@@ -42,6 +42,10 @@
     
   </main>
 
+  <?php
+    include("./delete-modal.php");
+  ?>
+
   
   <!-- <div class="attribution">
     Challenge by <a href="https://www.frontendmentor.io/challenges/interactive-comments-section-iG1RugEG9/hub/interactive-comments-section-8OPs_tBEMT" target="_blank">Frontend Mentor</a>. 

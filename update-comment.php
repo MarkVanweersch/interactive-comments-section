@@ -11,6 +11,14 @@
 
   $update_comment_statement->execute();
 
-  // geüpdatete comment selecteren en die terugsturen naar script.js, dit is de xhr.response
 
+  $updated_comment_query = "SELECT text FROM comments WHERE comment_id = " . $comment_id;
+
+  $new_comment_text = $conn->query($updated_comment_query);
+  
+  if ($new_comment_text->num_rows > 0) {
+    while ($row = $new_comment_text->fetch_assoc()) {
+      echo $row["text"];
+    }
+  }
 ?>

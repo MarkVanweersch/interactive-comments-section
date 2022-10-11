@@ -21,7 +21,7 @@ minusIcons.forEach((icon) => {
 deleteButtons = document.querySelectorAll(".delete-button");
 
 deleteButtons.forEach((button) => {
-  button.addEventListener("click", deleteComment);
+  button.addEventListener("click", showModal);
 });
 
 // add event listeners to edit buttons
@@ -39,6 +39,15 @@ replyButtons = document.querySelectorAll(".reply-button");
 replyButtons.forEach((button) => {
 button.addEventListener("click", insertReplyBox);
 });
+
+// add event listeners to modal buttons
+
+document.querySelector(".button.cancel").addEventListener("click", cancelDeletion);
+document.querySelector(".button.delete").addEventListener("click", deleteComment);
+
+const deleteModal = document.querySelector(".delete-modal-container");
+const darkOverlay = document.querySelector(".dark-overlay");
+
 
 // create and insert a new comment
 
@@ -90,8 +99,11 @@ function insertReplyBox(event) {
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
       replyContainer.innerHTML = xhr.response;
-      comment.querySelector(".reply-button").removeEventListener("click", insertReplyBox);
+      comment.querySelectorAll(".reply-button").forEach((item) => {
+        item.removeEventListener("click", insertReplyBox);
+      })
       replyBoxFunctionsAdder(replyContainer);
+      commentContainer.querySelector("textarea").focus();
     }
   }
 
@@ -110,8 +122,13 @@ function replyBoxFunctionsAdder(replyContainer) {
 
 function deleteReplyBox(event) {
   const commentContainer = event.currentTarget.closest(".comment-container");
+  
   commentContainer.querySelector(".reply-container").remove();
-  commentContainer.querySelector(".reply-button").addEventListener("click", insertReplyBox);
+
+  
+  commentContainer.querySelectorAll(".reply-button").forEach((item) => {
+    item.addEventListener("click", insertReplyBox);
+  })
 }
 
 // create new reply
@@ -120,7 +137,6 @@ function createReply(event) {
   const replyContainer = event.currentTarget.closest(".reply-container");
   const info = "text=" + replyContainer.querySelector("textarea").value + "&commentid=" + replyContainer.previousElementSibling.dataset.id;
   
-
   const xhr = new XMLHttpRequest();
 
   xhr.onreadystatechange = () => {
@@ -133,9 +149,14 @@ function createReply(event) {
           const newCommentsContainer = replyContainer.closest(".comment-wrapper").querySelector(".comment-replies-container");
           const newReplyDiv = document.createElement("div");
           newReplyDiv.innerHTML = newReplyRequest.response;
-          console.log(newReplyDiv);
-          newReplyDiv.querySelector(".edit-button").addEventListener("click", editComment);
-          newReplyDiv.querySelector(".delete-button").addEventListener("click", deleteComment);
+          newReplyDiv.querySelectorAll(".edit-button").forEach((item) => {
+            item.addEventListener("click", editComment);
+          })
+
+          newReplyDiv.querySelectorAll(".delete-button").forEach((item) => {
+            item.addEventListener("click", showModal);
+          })
+
           newCommentsContainer.appendChild(newReplyDiv);
           replyContainer.remove();
         }
@@ -179,6 +200,7 @@ function editComment(event) {
   commentInfoContainer.appendChild(editBox);
   commentInfoContainer.appendChild(updateButton);
 
+  editBox.focus();
 }
 
 // stop edit comment
@@ -204,9 +226,17 @@ function updateComment(event) {
 
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
-      console.log(xhr.response);
+      const newCommentText = document.createTextNode(xhr.response);
+      const commentText = comment.querySelector(".comment-text");
+      commentText.removeChild(commentText.firstChild);
+      commentText.appendChild(newCommentText);
 
-      // vervolgens weer de textarea sluiten en de geüpdatete comment laten zien
+      comment.querySelector("textarea").remove();
+      comment.querySelector(".button.update").remove();
+      commentText.style.display = "block";
+
+      comment.querySelector(".edit-button").removeEventListener("click", stopEditComment);
+      comment.querySelector(".edit-button").addEventListener("click", editComment);
     }
   }
 
@@ -215,11 +245,59 @@ function updateComment(event) {
   xhr.send(postInfo);
 }
 
+// show delete Modal
+
+let deleteCommentId = 0;
+
+function showModal(event) {
+  deleteModal.classList.add("active");
+  darkOverlay.classList.add("active");
+
+  darkOverlay.addEventListener("click", cancelDeletion);
+
+  const commentId = event.currentTarget.closest(".comment-card").dataset.id;
+  deleteCommentId = commentId;
+}
+
+
+// cancel deletion of comment
+
+function cancelDeletion() {
+  deleteModal.classList.remove("active");
+  darkOverlay.classList.remove("active");
+  darkOverlay.removeEventListener("click", cancelDeletion);
+}
+
 // delete comment
 
 function deleteComment() {
-  console.log("Delete meh");
-  // show modal before deleting
+  const postInfo = "commentid=" + deleteCommentId;
+
+  const xhr = new XMLHttpRequest();
+
+  xhr.onreadystatechange = () => {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+
+      const comment = document.querySelectorAll("[data-id]");
+      comment.forEach((item) => {
+        if (item.dataset.id == deleteCommentId) {
+          item.closest(".comment-wrapper").remove();
+        }
+      })
+
+    }
+
+    deleteModal.classList.remove("active");
+    darkOverlay.classList.remove("active");
+    darkOverlay.removeEventListener("click", cancelDeletion);
+
+  }
+
+  xhr.open("POST", "./delete-comment.php", true);
+  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhr.send(postInfo)
+
+
 }
 
 // upvote comment
@@ -237,11 +315,14 @@ function giveUpvote(event) {
   const commentId = comment.dataset.id;
   changeUpvotes(commentId, icon, "1");
 
-  const minusIcon = comment.querySelector(".minus-icon");
-  minusIcon.removeEventListener("click", giveDownvote);
-  minusIcon.removeEventListener("mouseover", makeBold);
-  minusIcon.classList.remove("pointer");
-  /* minusIcon.addEventListener("click", giveUpvoteTwice); */
+
+  const minusIcon = comment.querySelectorAll(".minus-icon");
+  
+  minusIcon.forEach((icon) => {
+    icon.removeEventListener("click", giveDownvote);
+    icon.removeEventListener("mouseover", makeBold);
+    icon.classList.remove("pointer");
+  })
 }
 
 // downvote comment
@@ -258,25 +339,13 @@ function giveDownvote(event) {
   const commentId = comment.dataset.id;
   changeUpvotes(commentId, icon, "-1");
 
-  const plusIcon = comment.querySelector(".plus-icon");
-  plusIcon.removeEventListener("click", giveUpvote);
-  plusIcon.removeEventListener("mouseover", makeBold);
-  plusIcon.removeEventListener("mouseleave", makeRegular);
-  plusIcon.classList.toggle("pointer");
-}
-
-// upvote downvoted comment
-
-function giveUpvoteTwice(event) {
-
-}
-
-// downvote upvoted comment
-
-function giveDownVoteTwice(event) {
-  /* const icon = event.currentTarget;
-  icon.style.width = "12px"; */
-
+  const plusIcon = comment.querySelectorAll(".plus-icon");
+  plusIcon.forEach((icon) => {
+    icon.removeEventListener("click", giveUpvote);
+    icon.removeEventListener("mouseover", makeBold);
+    icon.removeEventListener("mouseleave", makeRegular);
+    icon.classList.toggle("pointer");
+  })
 }
 
 // ajax upvotes call
