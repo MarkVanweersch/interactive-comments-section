@@ -53,4 +53,21 @@
       }
     }
   }
+
+  // get username of comment on which is replied
+
+  function get_replied_user_name($id, $conn) {
+    $user_id_query = 'SELECT user_id FROM comments WHERE comment_id = ' . $id;
+
+    $user_id = $conn->query($user_id_query);
+
+    if ($user_id->num_rows > 0) {
+      while ($row = $user_id->fetch_assoc()) {
+        echo "@";
+        echo get_user_name($row["user_id"], $conn);
+      }
+    }
+  }
+  
+  
 ?>

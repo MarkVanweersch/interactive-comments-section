@@ -48,6 +48,10 @@ document.querySelector(".button.delete").addEventListener("click", deleteComment
 const deleteModal = document.querySelector(".delete-modal-container");
 const darkOverlay = document.querySelector(".dark-overlay");
 
+// add event listener to new comment textarea
+
+document.querySelector("textarea[name=text]").addEventListener("click", removeError);
+
 
 // create and insert a new comment
 
@@ -57,8 +61,16 @@ const commentsContainer = document.querySelector(".comments-container");
 newCommentButton.addEventListener("click", createComment);
 
 function createComment() {
+  
+  const commentText = document.querySelector("textarea[name=text]");
+  if (commentText.value === "" || commentText.value === null) {
+    commentText.classList.add("error");
+    commentText.placeholder = "A new comment can't be empty.";
+    return;
+  }
+  const text = "text=" + commentText.value;
   const xhr = new XMLHttpRequest();
-  const text = "text=" + document.querySelector("textarea[name=text]").value;
+  commentText.value = "";
 
   xhr.open("POST", "./new-comment.php", true);
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -70,10 +82,16 @@ function createComment() {
 
       loadCommentRequest.onreadystatechange = () => {
         if (loadCommentRequest.readyState == 4 && loadCommentRequest.status == 200) {
+
           const newCommentDiv = document.createElement("div");
           newCommentDiv.innerHTML = loadCommentRequest.response;
-          newCommentDiv.querySelector(".edit-button").addEventListener("click", editComment);
-          newCommentDiv.querySelector(".delete-button").addEventListener("click", deleteComment);
+          
+          newCommentDiv.querySelectorAll(".edit-button").forEach((item) => {
+            item.addEventListener("click", editComment);
+          })
+          newCommentDiv.querySelectorAll(".delete-button").forEach((item) => {
+            item.addEventListener("click", showModal);
+          })
           commentsContainer.appendChild(newCommentDiv);
         } 
       }
@@ -103,6 +121,7 @@ function insertReplyBox(event) {
         item.removeEventListener("click", insertReplyBox);
       })
       replyBoxFunctionsAdder(replyContainer);
+      commentContainer.querySelector("textarea").addEventListener("click", removeError);
       commentContainer.querySelector("textarea").focus();
     }
   }
@@ -135,7 +154,19 @@ function deleteReplyBox(event) {
 
 function createReply(event) {
   const replyContainer = event.currentTarget.closest(".reply-container");
-  const info = "text=" + replyContainer.querySelector("textarea").value + "&commentid=" + replyContainer.previousElementSibling.dataset.id;
+  const replyTextarea = replyContainer.querySelector("textarea");
+
+  if (replyTextarea.value === "" || replyTextarea.value === null) {
+    replyTextarea.classList.add("error");
+    replyTextarea.placeholder = "A new comment can't be empty.";
+    return;
+  }
+
+  replyContainer.previousElementSibling.querySelectorAll(".reply-button").forEach((item) => {
+    item.addEventListener("click", insertReplyBox);
+  })
+  
+  const info = "text=" + replyTextarea.value + "&commentid=" + replyContainer.previousElementSibling.querySelector("input[type=hidden]").value;
   
   const xhr = new XMLHttpRequest();
 
@@ -181,6 +212,7 @@ function editComment(event) {
   editButton.addEventListener("click", stopEditComment);
 
   const editBox = document.createElement("textarea");
+  editBox.addEventListener("click", removeError);
 
   const updateButton = document.createElement("button");
   updateButton.classList.add("button", "comment", "update");
@@ -194,7 +226,11 @@ function editComment(event) {
 
   editBox.value = commentText.innerText;
 
-  commentText.style.display = "none";
+  const commentTextContainer = event.currentTarget.closest(".comment-card").querySelector(".comment-text-container");
+  commentTextContainer.style.display = "none";
+
+  const upvoteBarMobile = event.currentTarget.closest(".comment-card").querySelector(".upvote-bar.mobile");
+  upvoteBarMobile.style.display = "none";
 
   const commentInfoContainer =  event.currentTarget.closest(".comment-info-container")
   commentInfoContainer.appendChild(editBox);
@@ -209,7 +245,9 @@ function stopEditComment(event) {
   const comment = event.currentTarget.closest(".comment-card");
   comment.querySelector("textarea").remove();
   comment.querySelector(".button.update").remove();
-  comment.querySelector(".comment-text").style.display = "block";
+  comment.querySelector(".comment-text-container").style.display = "block";
+  comment.querySelector(".upvote-bar.mobile").style.display = "flex";
+
   event.currentTarget.addEventListener("click", editComment);
   event.currentTarget.removeEventListener("click", stopEditComment);
 }
@@ -218,8 +256,16 @@ function stopEditComment(event) {
 
 function updateComment(event) {
   const comment = event.currentTarget.closest(".comment-card");
-  const commentId = comment.dataset.id;
-  let postInfo = "text=" + comment.querySelector("textarea").value;
+  const commentId = comment.querySelector("input[type=hidden]").value;
+  const commentTextarea = comment.querySelector("textarea");
+
+  if (commentTextarea.value === "" || commentTextarea === null) {
+    commentTextarea.classList.add("error");
+    commentTextarea.placeholder = "A comment can't be empty";
+    return;
+  }
+  
+  let postInfo = "text=" + commentTextarea.value;
   postInfo += "&commentid=" + commentId;
   
   const xhr = new XMLHttpRequest();
@@ -227,16 +273,26 @@ function updateComment(event) {
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
       const newCommentText = document.createTextNode(xhr.response);
+      const newCommentTextElement = document.createElement("span");
+      newCommentTextElement.classList.add("comment-text");
+      newCommentTextElement.appendChild(newCommentText);
+
       const commentText = comment.querySelector(".comment-text");
-      commentText.removeChild(commentText.firstChild);
-      commentText.appendChild(newCommentText);
+      const commentTextContainer = comment.querySelector(".comment-text-container");
+
+      commentText.remove();
+      commentTextContainer.appendChild(newCommentTextElement);
 
       comment.querySelector("textarea").remove();
       comment.querySelector(".button.update").remove();
-      commentText.style.display = "block";
+      commentTextContainer.style.display = "block";
 
-      comment.querySelector(".edit-button").removeEventListener("click", stopEditComment);
-      comment.querySelector(".edit-button").addEventListener("click", editComment);
+      comment.querySelectorAll(".edit-button").forEach((item) => {
+        item.removeEventListener("click", stopEditComment);
+      });
+      comment.querySelectorAll(".edit-button").forEach((item) => {
+        item.addEventListener("click", editComment);
+      });
     }
   }
 
@@ -255,7 +311,7 @@ function showModal(event) {
 
   darkOverlay.addEventListener("click", cancelDeletion);
 
-  const commentId = event.currentTarget.closest(".comment-card").dataset.id;
+  const commentId = event.currentTarget.closest(".comment-card").querySelector("input[type=hidden]").value;
   deleteCommentId = commentId;
 }
 
@@ -278,9 +334,9 @@ function deleteComment() {
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
 
-      const comment = document.querySelectorAll("[data-id]");
+      const comment = document.querySelectorAll("input[type=hidden]");
       comment.forEach((item) => {
-        if (item.dataset.id == deleteCommentId) {
+        if (item.value == deleteCommentId) {
           item.closest(".comment-wrapper").remove();
         }
       })
@@ -312,7 +368,7 @@ function giveUpvote(event) {
   icon.classList.remove("pointer");
 
   const comment = icon.closest(".comment-card");
-  const commentId = comment.dataset.id;
+  const commentId = comment.querySelector("input[type=hidden]").value;
   changeUpvotes(commentId, icon, "1");
 
 
@@ -336,7 +392,7 @@ function giveDownvote(event) {
   icon.classList.remove("pointer");
 
   const comment = icon.closest(".comment-card");
-  const commentId = comment.dataset.id;
+  const commentId = comment.querySelector("input[type=hidden]").value;
   changeUpvotes(commentId, icon, "-1");
 
   const plusIcon = comment.querySelectorAll(".plus-icon");
@@ -392,4 +448,12 @@ function makeRegular(event) {
   } else {
     icon.src = "./images/icon-minus.svg";
   }
+}
+
+// remove error colors from textarea
+
+function removeError(event) {
+  const textArea = event.currentTarget;
+  textArea.classList.remove("error");
+  textArea.placeholder = "Add a new comment...";
 }

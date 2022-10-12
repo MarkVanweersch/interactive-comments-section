@@ -1,6 +1,6 @@
 <div class="comment-wrapper">
   <div class="comment-container">
-    <article class="comment-card" data-id=<?php echo $row["comment_id"] ?>>
+    <article class="comment-card">
 
       <div class="upvote-bar desktop">
         <img class="plus-icon pointer" src="./images/icon-plus.svg" alt="">
@@ -21,6 +21,11 @@
               get_user_name($row["user_id"], $conn);
             ?>
           </span>
+            <?php
+              if ($row["user_id"] == 4) {
+                echo '<div class="you-tag">you</div>';
+              }
+            ?>
           <span class="date">
             <?php
               echo $row["post_date"];
@@ -55,10 +60,20 @@
 
         </header>
 
-        <p class="comment-text">
-          <?php
-            echo $row["text"];
-          ?>
+        <p class="comment-text-container">
+          <span class="user-tagged">
+            <?php
+              if ($row["reply_to"] !== NULL) {
+                get_replied_user_name($row["reply_to"], $conn);
+              }
+            ?>
+          </span>
+          <span class="comment-text">
+            <?php
+              echo $row["text"];
+            ?>
+          </span>
+          <input type="hidden" value=" <?php echo $row['comment_id'] ?>">
         </p>
 
         <div class="comment-options-container mobile">

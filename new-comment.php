@@ -3,12 +3,14 @@
   include("./db-connection.php");
 
   $user = "juliusomo";
-  $text = $_POST['text'];
+  $text_unfiltered = ($_POST['text']);
   $date = date("Y-m-d");
 
+  $text = filter_var($text_unfiltered, FILTER_SANITIZE_STRING);
   $upvotes = 0;
   $user_id = 4;
 
+  echo $text;
 
   $new_comment_statement = $conn->prepare("INSERT INTO comments (text, post_date, upvotes, user_id) VALUES (?, ?, ?, ?)");
 

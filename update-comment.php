@@ -2,7 +2,7 @@
 
   include("./db-connection.php");
 
-  $comment_text = urldecode($_POST["text"]);
+  $comment_text = filter_var($_POST["text"], FILTER_SANITIZE_STRING);
   $comment_id = $_POST["commentid"];
 
   $update_comment_statement = $conn->prepare("UPDATE comments SET text = ? WHERE comment_id = ?");

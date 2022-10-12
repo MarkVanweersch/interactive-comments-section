@@ -121,6 +121,14 @@ body {
   font-weight: 700;
 }
 
+.comment-header .you-tag {
+  padding: 2px 8px 4px;
+  font-size: 0.9em;
+  color: var(--clr-ntr-white);
+  border-radius: 4px;
+  background-color: var(--clr-prm-moderate-blue);
+}
+
 .comment-header .date {
   color: var(--clr-ntr-gray-blue)
 }
@@ -156,9 +164,13 @@ body {
   color: var(--clr-prm-light-gray-blue);
 }
 
-.comment-text {
+.comment-text-container {
   line-height: 24px;
   color: var(--clr-ntr-gray-blue);
+}
+
+.comment-text-container .user-tagged {
+  color: var(--clr-prm-moderate-blue);
 }
 
 .comment-info-container textarea {
@@ -202,6 +214,24 @@ body {
   border-radius: 0.5em;
 }
 
+.comment-info-container textarea {
+  margin-top: 1em;
+}
+
+.comment-card.new-comment textarea.error, 
+.comment-info-container textarea.error {
+  border: 1px solid var(--clr-prm-soft-red);
+}
+
+.comment-card.new-comment textarea.error::placeholder, 
+.comment-info-container textarea.error::placeholder {
+  color: var(--clr-prm-soft-red);
+}
+
+textarea:focus {
+  outline: 1px solid var(--clr-ntr-dark-blue);
+}
+
 .button {
   padding: 0.9em;
   font-size: 0.9em;
@@ -223,6 +253,7 @@ body {
 .button.update {
   display: block;
   margin-left: auto;
+  margin-top: 1em;
 }
 
 .reply-box-buttons-container {
@@ -306,7 +337,7 @@ body {
   pointer-events: all;
 }
 
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 600px) {
   .main-container {
     padding-inline: 1em;
   }
@@ -332,10 +363,6 @@ body {
 
   .upvote-bar.mobile {
     flex-direction: row;
-  }
-
-  .comment-header-options.mobile {
-    margin-left: unset;
   }
 
   .comment-replies-container {
@@ -372,5 +399,9 @@ body {
   .reply-box-buttons-container img {
     width: 18px;
     height: 22px;
+  }
+
+  .delete-modal-container {
+    width: 95%;
   }
 }
