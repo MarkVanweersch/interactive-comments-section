@@ -337,6 +337,16 @@ textarea:focus {
   pointer-events: all;
 }
 
+footer {
+  margin-block: 2em 1em;
+  margin-inline: auto;
+  width: fit-content;
+}
+
+footer a {
+  color: inherit;
+}
+
 @media screen and (max-width: 600px) {
   .main-container {
     padding-inline: 1em;
