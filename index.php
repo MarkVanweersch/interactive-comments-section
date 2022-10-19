@@ -47,12 +47,12 @@
   ?>
 
   
-  <!-- <div class="attribution">
-    Challenge by <a href="https://www.frontendmentor.io/challenges/interactive-comments-section-iG1RugEG9/hub/interactive-comments-section-8OPs_tBEMT" target="_blank">Frontend Mentor</a>. 
-    Coded by <a href="https://markvanweersch.github.io/">Mark Vanweersch</a>.
-  </div> -->
+<footer>
+  Challenge by <a href="https://www.frontendmentor.io/challenges/interactive-comments-section-iG1RugEG9/hub/interactive-comments-section-8OPs_tBEMT" target="_blank">Frontend Mentor</a>. 
+  Coded by <a href="https://markvanweersch.nl">Mark Vanweersch</a>.
+</footer>
 
-  <script src="./script.js"></script>
+<script src="./script.js"></script>
 
 </body>
 </html>
